@@ -51,13 +51,7 @@ public class ChatServer {
 
 
     }
-    /**
-    public  void ReadIn(String zed) throws IOException {
-        for (ServerWorker s : clientell){
-            s.printer(zed);
-        }
-    }
-     **/
+
     public static ArrayList<ServerWorker> getClientell(){
         return clientell;
     }

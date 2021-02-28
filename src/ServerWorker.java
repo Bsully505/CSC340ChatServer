@@ -31,7 +31,7 @@ public class ServerWorker extends Thread {
     }
 
     /**
-     * what i am going to have to add
+     * what i am going to have to add is the username for the client
      * @param client
      * @throws IOException
      */
@@ -41,11 +41,11 @@ public class ServerWorker extends Thread {
         BufferedReader in = new BufferedReader(new InputStreamReader(input));
         String line;
         while((line = in.readLine()) != null){
+            //this is where the
             if("quit".equalsIgnoreCase(line)){
                 break;
             }
-            //String subStr = line.substring(6);
-            //new ChatServer(subStr);
+
 
 
             String msg = client.getInetAddress()+ ": You Typed: " + line+ "\n";
