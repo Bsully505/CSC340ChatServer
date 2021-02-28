@@ -65,7 +65,7 @@ public class ServerWorker extends Thread {
                 case "TRANSMIT":
                     printer("NEWMESSAGE "+ Username + line.split(" ")[1]);
                     break;
-                case "JOIN ROOM":
+                case "JOIN":
                     //i need to create a join room
                     break;
                 case "EXIT":
@@ -77,27 +77,27 @@ public class ServerWorker extends Thread {
                     output.write("Not a valid protocol \n".getBytes() );
 
             }
-            switch(NewLine){
-                case "ENTER NAME":
-                    //create a synchronis function for these cases
-                    Username = line.split(":")[1];// i might need to double check this for if someone has a debug line which includes 2 colens
-                    printer("ACK ENTER NAME:"+ Username);
-                    break;
-                case "TRANSMIT MESSAGE":
-                    printer("NEWMESSAGE "+ Username + line.split(":")[1]);
-                    break;
-                case "JOIN ROOM":
-                    //i need to create a join room
-                    break;
-                case "EXIT":
-                    printer("EXITING "+Username+":");
-                    System.out.println(Username + " HAS LEFT");
-                    client.close();
-                    break;
-                default:
-                    output.write("Not a valid protocol \n".getBytes() );
-
-            }
+//            switch(NewLine){
+//                case "ENTER NAME":
+//                    //create a synchronis function for these cases
+//                    Username = line.split(":")[1];// i might need to double check this for if someone has a debug line which includes 2 colens
+//                    printer("ACK ENTER NAME:"+ Username);
+//                    break;
+//                case "TRANSMIT MESSAGE":
+//                    printer("NEWMESSAGE "+ Username + line.split(":")[1]);
+//                    break;
+//                case "JOIN ROOM":
+//                    //i need to create a join room
+//                    break;
+//                case "EXIT":
+//                    printer("EXITING "+Username+":");
+//                    System.out.println(Username + " HAS LEFT");
+//                    client.close();
+//                    break;
+//                default:
+//                    output.write("Not a valid protocol \n".getBytes() );
+//
+//            }
 
 
 
