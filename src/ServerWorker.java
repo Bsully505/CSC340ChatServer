@@ -30,7 +30,11 @@ public class ServerWorker extends Thread {
         }
     }
 
-
+    /**
+     * what i am going to have to add
+     * @param client
+     * @throws IOException
+     */
     public void HandleClient(Socket client) throws IOException {//this is for the input of each client
          output = client.getOutputStream();
         InputStream input = client.getInputStream();
