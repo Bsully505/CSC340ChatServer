@@ -234,7 +234,7 @@ public class ChatClient extends JFrame {
             // When not connected to server
         } else {
             // When connected to server
-            out.println("[" + userName + "]: " + msg);
+            out.println("TRANSMIT [" + userName + "]: " + msg);
             postMessage("[" + userName + "]: " + msg);
         }
     }
