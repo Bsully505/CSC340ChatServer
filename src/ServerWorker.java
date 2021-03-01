@@ -45,7 +45,7 @@ public class ServerWorker extends Thread {
         InputStream input = client.getInputStream();
         BufferedReader in = new BufferedReader(new InputStreamReader(input));
         String line;
-        while((line = in.readLine()) != null){
+        while(!client.isClosed() && (line = in.readLine()) != null){
 
             String NewLiner = line;
             if(line.contains(" ")){
@@ -86,10 +86,10 @@ public class ServerWorker extends Thread {
 
     }
     public synchronized void JoinRoom(String line) throws IOException {
-        printer("EXITING " + Username, RoomID);
+        printer("EXITING " + Username + "\n", RoomID);
         RoomID = line.split(" ", 2)[1];
-        printBackToSender("ACK JOIN " + RoomID);
-        printer("Entering " + Username, RoomID);
+        printBackToSender("ACK JOIN \n" + RoomID);
+        printer("Entering " + Username + "\n", RoomID);
     }
 
     public synchronized void EnterName(String line) throws IOException {
@@ -108,10 +108,7 @@ public class ServerWorker extends Thread {
         printer("EXITING "+Username+"\n",this.RoomID);
         System.out.println(Username + " HAS LEFT");
         this.clientell = ChatServer.getClientell();
-        System.out.println(client.getOutputStream());
-        System.out.println("this reaches here");
-        System.out.print(clientell.contains(this));
-        System.out.println(clientell.remove(this));
+        clientell.remove(this);
         ChatServer.SetClientell(clientell);
         client.close();
     }
@@ -119,7 +116,7 @@ public class ServerWorker extends Thread {
     public synchronized void Print(String line) throws IOException {
         line = line;
         for(ServerWorker i : clientell){
-            System.out.println(clientell.indexOf(i));
+            System.out.print(clientell.indexOf(i) +": "+ clientell.get(clientell.indexOf(i)).Username+ " in room "+clientell.get(clientell.indexOf(i)).RoomID);
         }
     }
 
