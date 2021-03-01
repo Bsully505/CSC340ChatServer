@@ -55,41 +55,20 @@ public class ServerWorker extends Thread {
             //transmit hello my name is bob -> [transmit , hello my name is bob] [0] = transmit while [1] = hello my name is bob
             switch(NewLiner){
                 case "ENTER":
-                    //create a synchronis function for these cases
-                    Username = line.split(" ")[1];// i might need to double check this for if someone has a debug line which includes 2 colens
-                    printer("ACK ENTER "+ Username + "\n",this.RoomID);
+                    this.EnterName(line);
                     break;
                 case "TRANSMIT":
-                    printer("NEWMESSAGE "+ Username +" "+line.split(" ",2)[1] + "\n",this.RoomID);
+                    this.Transmit(line);
                     break;
                 case "JOIN":
-                    //i might need to create a userinput case
-                    printer("EXITING "+Username,RoomID);
-                    RoomID = line.split(" ", 2)[1];
-                    printBackToSender("ACK JOIN "+ RoomID);
-                    printer("Entering "+Username,RoomID);
-
-
-
+                    this.JoinRoom(line);
                     //i need to create a join room
                     break;
                 case "EXIT": // this is not working
-                    printer("EXITING "+Username+"\n",this.RoomID);
-                    System.out.println(Username + " HAS LEFT");
-                    this.clientell = ChatServer.getClientell();
-                    System.out.println(client.getOutputStream());
-                    System.out.println("this reaches here");
-                    System.out.print(clientell.contains(this));
-                    System.out.println(clientell.remove(this));
-                    ChatServer.SetClientell(clientell);
-                    client.close();
-
+                    this.Exit(line);
                     break;
-
                 case "PRINT":
-                    for(ServerWorker i : clientell){
-                        System.out.println(clientell.indexOf(i));
-                    }
+                    this.Print(line);
                     break;
                 default:
                     output = client.getOutputStream();
@@ -97,7 +76,7 @@ public class ServerWorker extends Thread {
 
             }
 
-            String msg = client.getInetAddress()+ ": You Typed: " + line+ "\n";
+            String msg = this.Username + " Typed: " + line+ "\n";
             System.out.println(msg);//this is the thing that is printing onto my terminal
 
         }
@@ -106,6 +85,44 @@ public class ServerWorker extends Thread {
 
 
     }
+    public synchronized void JoinRoom(String line) throws IOException {
+        printer("EXITING " + Username, RoomID);
+        RoomID = line.split(" ", 2)[1];
+        printBackToSender("ACK JOIN " + RoomID);
+        printer("Entering " + Username, RoomID);
+    }
+
+    public synchronized void EnterName(String line) throws IOException {
+        line = line;
+        Username = line.split(" ")[1];// i might need to double check this for if someone has a debug line which includes 2 colens
+        printer("ACK ENTER "+ Username + "\n",this.RoomID);
+
+    }
+    public synchronized void Transmit(String line) throws IOException {
+        line = line;
+        printer("NEWMESSAGE "+ Username +" "+line.split(" ",2)[1] + "\n",this.RoomID);
+    }
+
+    public synchronized void Exit(String line) throws IOException {
+        line = line;
+        printer("EXITING "+Username+"\n",this.RoomID);
+        System.out.println(Username + " HAS LEFT");
+        this.clientell = ChatServer.getClientell();
+        System.out.println(client.getOutputStream());
+        System.out.println("this reaches here");
+        System.out.print(clientell.contains(this));
+        System.out.println(clientell.remove(this));
+        ChatServer.SetClientell(clientell);
+        client.close();
+    }
+
+    public synchronized void Print(String line) throws IOException {
+        line = line;
+        for(ServerWorker i : clientell){
+            System.out.println(clientell.indexOf(i));
+        }
+    }
+
 
 //find out who i have to send it too
     //array list
@@ -130,3 +147,5 @@ public class ServerWorker extends Thread {
     }
 
 }
+
+
