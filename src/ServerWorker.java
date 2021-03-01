@@ -36,7 +36,7 @@ public class ServerWorker extends Thread {
     }
 
     /**
-     * what i am going to have to add is the username for the client
+     *
      * @param client
      * @throws IOException
      */
@@ -46,16 +46,10 @@ public class ServerWorker extends Thread {
         BufferedReader in = new BufferedReader(new InputStreamReader(input));
         String line;
         while((line = in.readLine()) != null){
-            //input could be Transmit Message:, EnterName:
-            //Exit or join room, ack join room, ACK EnterName,
-            //
-            // NewMessage Name Message
-            //enter name
-            //this is where the
-            String NewLine = line;
+
             String NewLiner = line;
             if(line.contains(" ")){
-                 //NewLine = line.split(":")[0].toUpperCase();
+
                  NewLiner = line.split(" ")[0].toUpperCase();
             }
             //transmit hello my name is bob -> [transmit , hello my name is bob] [0] = transmit while [1] = hello my name is bob
@@ -70,7 +64,12 @@ public class ServerWorker extends Thread {
                     break;
                 case "JOIN":
                     //i might need to create a userinput case
+                    printer("EXITING "+Username,RoomID);
                     RoomID = line.split(" ", 2)[1];
+                    printBackToSender("ACK JOIN "+ RoomID);
+                    printer("Entering "+Username,RoomID);
+
+
 
                     //i need to create a join room
                     break;
@@ -97,36 +96,10 @@ public class ServerWorker extends Thread {
                     output.write("Not a valid protocol \n".getBytes() );
 
             }
-//            switch(NewLine){
-//                case "ENTER NAME":
-//                    //create a synchronis function for these cases
-//                    Username = line.split(":")[1];// i might need to double check this for if someone has a debug line which includes 2 colens
-//                    printer("ACK ENTER NAME:"+ Username);
-//                    break;
-//                case "TRANSMIT MESSAGE":
-//                    printer("NEWMESSAGE "+ Username + line.split(":")[1]);
-//                    break;
-//                case "JOIN ROOM":
-//                    //i need to create a join room
-//                    break;
-//                case "EXIT":
-//                    printer("EXITING "+Username+":");
-//                    System.out.println(Username + " HAS LEFT");
-//                    client.close();
-//                    break;
-//                default:
-//                    output.write("Not a valid protocol \n".getBytes() );
-//
-//            }
-
-
-
 
             String msg = client.getInetAddress()+ ": You Typed: " + line+ "\n";
             System.out.println(msg);//this is the thing that is printing onto my terminal
 
-            //printer(msg);
-            //output.write(msg.getBytes());
         }
         System.out.println("someone has left");
         client.close();
@@ -136,6 +109,10 @@ public class ServerWorker extends Thread {
 
 //find out who i have to send it too
     //array list
+    public synchronized void printBackToSender(String zed) throws IOException {
+        output = client.getOutputStream();
+        output.write(zed.getBytes());
+    }
     public synchronized void printer(String zed,String RoomKey) throws IOException {// nobody can connect at this time
         this.clientell = ChatServer.getClientell();
         for(ServerWorker s: clientell){
