@@ -14,14 +14,10 @@ public class ChatServer {
          this.port = 1518;
     }
 
-    public ChatServer(String message) throws IOException {
-        //ReadIn(message);
-    }
+
 
     public void run(){
         try {
-//            OutputStream output = client.getOutputStream();
-//            InputStream input = client.getInputStream();
             ServerSocket serverSocket = new ServerSocket(port);
             while(true){
 
@@ -30,11 +26,7 @@ public class ChatServer {
                 System.out.println("Socket accepted");
                 ServerWorker s = new ServerWorker(ClientSocket);
                 clientell.add(s);
-
-
                 s.start();
-
-
 
             }
         }

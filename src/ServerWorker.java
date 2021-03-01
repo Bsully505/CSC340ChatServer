@@ -1,6 +1,8 @@
 /**
  * the first thread always communicates with the latest one
  * testing
+ * efficiancy mulpile
+ * he recommend one the name two the socket and input stream and the output stream and the room num
  */
 
 
@@ -61,16 +63,19 @@ public class ServerWorker extends Thread {
                 case "ENTER":
                     //create a synchronis function for these cases
                     Username = line.split(" ")[1];// i might need to double check this for if someone has a debug line which includes 2 colens
-                    printer("ACK ENTER "+ Username + "\n");
+                    printer("ACK ENTER "+ Username + "\n",this.RoomID);
                     break;
                 case "TRANSMIT":
-                    printer("NEWMESSAGE "+ Username +" "+line.split(" ",2)[1] + "\n");
+                    printer("NEWMESSAGE "+ Username +" "+line.split(" ",2)[1] + "\n",this.RoomID);
                     break;
                 case "JOIN":
+                    //i might need to create a userinput case
+                    RoomID = line.split(" ", 2)[1];
+
                     //i need to create a join room
                     break;
                 case "EXIT": // this is not working
-                    printer("EXITING "+Username+"\n");
+                    printer("EXITING "+Username+"\n",this.RoomID);
                     System.out.println(Username + " HAS LEFT");
                     this.clientell = ChatServer.getClientell();
                     System.out.println(client.getOutputStream());
@@ -129,17 +134,16 @@ public class ServerWorker extends Thread {
 
     }
 
-
-    public static void ChangeUserName(){
-
-    }
-
-    public synchronized void printer(String zed) throws IOException {
+//find out who i have to send it too
+    //array list
+    public synchronized void printer(String zed,String RoomKey) throws IOException {// nobody can connect at this time
         this.clientell = ChatServer.getClientell();
         for(ServerWorker s: clientell){
-            Socket temp = s.getSocket();
-            OutputStream out = temp.getOutputStream();
-            out.write(zed.getBytes());
+            if(s.RoomID == RoomKey) {
+                Socket temp = s.getSocket();
+                OutputStream out = temp.getOutputStream();
+                out.write(zed.getBytes());
+            }
         }
 
     }
