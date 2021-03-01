@@ -1,7 +1,7 @@
 /******
  * ChatClient
- * Author: Christian Duncan 
- * Updated by: ...
+ * Author: Christian Duncan
+ * Updated by: Dylan Irwin
  *
  * This code provides a basic GUI ChatClient.
  * It is a single frame made of 3 parts:
@@ -9,21 +9,21 @@
  *    An input textbox for entering in messages to send
  *    A "send" button to send the current textbox material.
  *
- * THIS IS JUST A FRAMEWORK so actual communication is not yet 
+ * THIS IS JUST A FRAMEWORK so actual communication is not yet
  * established.
- *
- * what i am working on is trying to write something in the chat client and have the chat server see it
  ******/
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.IOException;
+import java.net.*;
 import java.io.PrintWriter;
-import java.net.Socket;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.util.Scanner;
 
 public class ChatClient extends JFrame {
-
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         // Create and start up the ChatClient Frame
         ChatClient frame = new ChatClient();
 
@@ -35,20 +35,23 @@ public class ChatClient extends JFrame {
     private JTextArea chatTextArea;
     private JTextArea sendTextArea;
     private Action nameAction;
-    private String hostname = "127.0.0.1";  // Default is local host "10.115.100.77";
-    private int port = 1518;                // Default port is 1518
+
+    private String hostname = "127.0.0.1";  // Default is local host
+    // REMEMBER TO CHANGE
+    private int port = 1519;                // Default port is 1518
     private String userName = "<UNDEFINED>";
-    Socket client;
-    PrintWriter out;
+    private boolean resetFlag;
+    private Socket socket = null;
+    private PrintWriter out = null;
+    private BufferedReader in = null;
 
     /* Constructor: Sets up the initial look-and-feel */
-    public ChatClient() throws IOException {
+    public ChatClient() {
         JLabel label;  // Temporary variable for a label
         JButton button; // Temporary variable for a button
 
         // Set up the initial size and layout of the frame
         // For this we will keep it to a simple BoxLayout
-
         setLocation(100, 100);
         setPreferredSize(new Dimension(1000, 500));
         setTitle("CSC340 Chat Client");
@@ -85,7 +88,8 @@ public class ChatClient extends JFrame {
                     // There is something to transmit
                     // NOTE: You will want to fix this so it actually
                     // TRANSMITS the message to the server!
-                    postMessage("DEBUG: Transmit: " + message);
+                    sendMsg(message);
+                    //postMessage("DEBUG: Transmit: " + message);
                     sendTextArea.setText("");  // Clear out the field
                 }
                 sendTextArea.requestFocus();  // Focus back on box
@@ -110,8 +114,9 @@ public class ChatClient extends JFrame {
                 String newUserName = JOptionPane.showInputDialog("Please enter a user name.  Current user name: " + userName);
                 // NOTE: This does not TRANSMIT the request to the server
                 // This is just a placeholder to display the choice.
-                postMessage("DEBUG: User name: " + newUserName);
+                //postMessage("DEBUG: User name: " + newUserName);
                 changeUserName(newUserName); // Ideally, this would be done only once the server accepts and replies back with user name
+                //Change the above function to work with server
             }
         };
         changeUserName("<UNDEFINED>");
@@ -151,8 +156,6 @@ public class ChatClient extends JFrame {
                 String newHostName = JOptionPane.showInputDialog("Please enter a server IP/Hostname.\nThis only takes effect after the next connection attempt.\nCurrent server address: " + hostname);
                 if (newHostName != null && newHostName.length() > 0)
                     hostname = newHostName;
-
-
             }
         };
         menuAction.putValue(Action.SHORT_DESCRIPTION, "Change server IP address.");
@@ -185,17 +188,11 @@ public class ChatClient extends JFrame {
         menuAction = new AbstractAction("Connect to Server") {
             public void actionPerformed(ActionEvent e) {
                 //JOptionPane.showMessageDialog(null, "This is not yet implemented!\nPlease try again later.", "Unimplemented Option", JOptionPane.PLAIN_MESSAGE);
-                JOptionPane.showMessageDialog(null,"trying to join new ip Address");
-
-                try {
-                    client = new Socket(hostname,port);
-                    out = new PrintWriter(client.getOutputStream(),true);
-                } catch (IOException ioException) {
-                    ioException.printStackTrace();
-                }
+                //Function Call establishConnection
+                establishConnection();
             }
         };
-        menuAction.putValue(Action.SHORT_DESCRIPTION, "Change server PORT.");
+        menuAction.putValue(Action.SHORT_DESCRIPTION, "Connect to server.");
         menuItem = new JMenuItem(menuAction);
         menu.add(menuItem);
 
@@ -203,19 +200,47 @@ public class ChatClient extends JFrame {
         setJMenuBar(mbar);
     }
 
+    //  Connects to Server
+    public void establishConnection(){
+        try {
+            socket = new Socket(hostname, port);
+            out = new PrintWriter(socket.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out.println("Yo, we're live");
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     // Changes the user name on the nameAction
     public void changeUserName(String newName) {
         userName = newName;
         nameAction.putValue(Action.NAME, "User Name: " + userName);
+        //System.out.println("Made it here");
+        if (out == null) {
+            // When not connected to server
+            //System.out.println("Not Conntected");
+        } else {
+            // When connected to server
+            out.println("ENTER " + userName);
+        }
     }
 
+    // Message Sending
+    public void sendMsg(String msg) {
+        if (out == null) {
+            // When not connected to server
+        } else {
+            // When connected to server
+            out.println("[" + userName + "]: " + msg);
+            postMessage("[" + userName + "]: " + msg);
+        }
+    }
 
     // Post a message on the main Chat Text Area (with a new line)
-    public synchronized void postMessage(String message)  {
-        //i need to somehow send the message to server worker.
-        //System.out.println(message);
-        //ChatServer.ReadIn(message);
+    public synchronized void postMessage(String message) {
         chatTextArea.append(message + "\n");
-        out.println(message);
     }
 }

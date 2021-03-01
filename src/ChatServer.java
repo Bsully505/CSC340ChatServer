@@ -55,7 +55,9 @@ public class ChatServer {
     public static ArrayList<ServerWorker> getClientell(){
         return clientell;
     }
-
+    public static void SetClientell(ArrayList<ServerWorker> newest){
+        clientell = newest;
+    }
 
 
 }

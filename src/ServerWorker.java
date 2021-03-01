@@ -52,28 +52,43 @@ public class ServerWorker extends Thread {
             //this is where the
             String NewLine = line;
             String NewLiner = line;
-            if(line.contains(":")){
-                 NewLine = line.split(":")[0].toUpperCase();
+            if(line.contains(" ")){
+                 //NewLine = line.split(":")[0].toUpperCase();
                  NewLiner = line.split(" ")[0].toUpperCase();
             }
+            //transmit hello my name is bob -> [transmit , hello my name is bob] [0] = transmit while [1] = hello my name is bob
             switch(NewLiner){
                 case "ENTER":
                     //create a synchronis function for these cases
                     Username = line.split(" ")[1];// i might need to double check this for if someone has a debug line which includes 2 colens
-                    printer("ACK ENTER "+ Username);
+                    printer("ACK ENTER "+ Username + "\n");
                     break;
                 case "TRANSMIT":
-                    printer("NEWMESSAGE "+ Username + line.split(" ")[1]);
+                    printer("NEWMESSAGE "+ Username +" "+line.split(" ",2)[1] + "\n");
                     break;
                 case "JOIN":
                     //i need to create a join room
                     break;
-                case "EXIT":
-                    printer("EXITING "+Username+":");
+                case "EXIT": // this is not working
+                    printer("EXITING "+Username+"\n");
                     System.out.println(Username + " HAS LEFT");
+                    this.clientell = ChatServer.getClientell();
+                    System.out.println(client.getOutputStream());
+                    System.out.println("this reaches here");
+                    System.out.print(clientell.contains(this));
+                    System.out.println(clientell.remove(this));
+                    ChatServer.SetClientell(clientell);
                     client.close();
+
+                    break;
+
+                case "PRINT":
+                    for(ServerWorker i : clientell){
+                        System.out.println(clientell.indexOf(i));
+                    }
                     break;
                 default:
+                    output = client.getOutputStream();
                     output.write("Not a valid protocol \n".getBytes() );
 
             }
@@ -132,4 +147,5 @@ public class ServerWorker extends Thread {
     public Socket getSocket(){
         return client;
     }
+
 }
