@@ -38,7 +38,7 @@ public class ChatClient extends JFrame {
 
     private String hostname = "127.0.0.1";  // Default is local host
     // REMEMBER TO CHANGE
-    private int port = 1519;                // Default port is 1518
+    private int port = 1518;                // Default port is 1518
     private String userName = "<UNDEFINED>";
     private boolean resetFlag;
     private Socket socket = null;
