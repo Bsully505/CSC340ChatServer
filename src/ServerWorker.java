@@ -94,13 +94,23 @@ public class ServerWorker extends Thread {
 
     public synchronized void EnterName(String line) throws IOException {
         line = line;
-        Username = line.split(" ")[1];// i might need to double check this for if someone has a debug line which includes 2 colens
-        printer("ACK ENTER "+ Username + "\n",this.RoomID);
 
+        try {
+            Username = line.split(" ")[1];// i might need to double check this for if someone has a debug line which includes 2 colens
+            printer("ACK ENTER "+ Username + "\n",this.RoomID);
+        }
+        catch(ArrayIndexOutOfBoundsException e) {
+            output.write("Not a valid protocol \n".getBytes() );
+        }
     }
     public synchronized void Transmit(String line) throws IOException {
         line = line;
-        printer("NEWMESSAGE "+ Username +" "+line.split(" ",2)[1] + "\n",this.RoomID);
+        try {
+            printer("NEWMESSAGE "+ Username +" "+line.split(" ",2)[1] + "\n",this.RoomID);
+        }
+        catch(ArrayIndexOutOfBoundsException e) {
+            output.write("Not a valid protocol \n".getBytes() );
+        }
     }
 
     public synchronized void Exit(String line) throws IOException {

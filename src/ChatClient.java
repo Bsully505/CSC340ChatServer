@@ -1,7 +1,7 @@
 /******
  * ChatClient
  * Author: Christian Duncan
- * Updated by: Dylan Irwin
+ * Updated by: Dylan Irwin, Jack Zemlanicky
  *
  * This code provides a basic GUI ChatClient.
  * It is a single frame made of 3 parts:
@@ -35,11 +35,13 @@ public class ChatClient extends JFrame {
     private JTextArea chatTextArea;
     private JTextArea sendTextArea;
     private Action nameAction;
+    private Action roomNameAction;
 
     private String hostname = "127.0.0.1";  // Default is local host
     // REMEMBER TO CHANGE
-    private int port = 1518;                // Default port is 1518
+    private int port = 1519;                // Default port is 1518
     private String userName = "<UNDEFINED>";
+    private String roomName= "0";
     private boolean resetFlag;
     private Socket socket = null;
     private PrintWriter out = null;
@@ -124,6 +126,31 @@ public class ChatClient extends JFrame {
         button = new JButton(nameAction);
         button.setAlignmentX(JButton.CENTER_ALIGNMENT);
         mainPane.add(button);
+        //set up a button to input a group name and send the name to the server
+        roomNameAction = new AbstractAction("Set/Change room name") {
+            public void actionPerformed(ActionEvent e) {
+                // Get the new user name and transmit to the server!
+                String newRoomName = roomName;
+                boolean flag = true;
+                while(flag && newRoomName != null){
+                    newRoomName = JOptionPane.showInputDialog("Enter a room name. Current room: " + roomName);
+                    if (isAlphaNumeric(newRoomName)){
+                        changeRoomName(newRoomName);
+                        flag = false;
+                    } else {
+                        if (newRoomName != null) {
+                            JOptionPane.showMessageDialog(null, "An invalid charcater was input, please only use AlphaNumerics.");
+                        }
+                    }
+                }
+            }
+        };
+        changeRoomName("0");
+        roomNameAction.putValue(Action.SHORT_DESCRIPTION, "Push this to change the current room name.");
+        button = new JButton(roomNameAction);
+        button.setAlignmentX(JButton.CENTER_ALIGNMENT);
+        mainPane.add(button);
+
 
         // Setup the menubar
         setupMenuBar();
@@ -227,6 +254,20 @@ public class ChatClient extends JFrame {
             out.println("ENTER " + userName);
         }
     }
+    public void changeRoomName(String newRoom) {
+        roomName = newRoom;
+        //System.out.println("room command");
+        if (isAlphaNumeric(roomName) == true) {
+            roomNameAction.putValue(Action.NAME, "Room name: " + roomName);
+            if (out == null){
+                // Do nothing
+            } else {
+                out.println("JOIN " + roomName);
+            }
+        } else {
+            // TBD
+        }
+    }
 
     // Message Sending
     public void sendMsg(String msg) {
@@ -239,6 +280,9 @@ public class ChatClient extends JFrame {
         }
     }
 
+    public static boolean isAlphaNumeric(String tempRoom) {
+        return tempRoom != null && tempRoom.matches("^[a-zA-Z0-9]*$");
+    }
     // Post a message on the main Chat Text Area (with a new line)
     public synchronized void postMessage(String message) {
         chatTextArea.append(message + "\n");
