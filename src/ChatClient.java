@@ -133,7 +133,7 @@ public class ChatClient extends JFrame {
                 String newRoomName = roomName;
                 boolean flag = true;
                 while(flag && newRoomName != null){
-                    newRoomName = JOptionPane.showInputDialog("Enter a room name. Current room: " +roomName);
+                    newRoomName = JOptionPane.showInputDialog("Enter a room name. Current room: " + roomName);
                     if (isAlphaNumeric(newRoomName)){
                         changeRoomName(newRoomName);
                         flag = false;
