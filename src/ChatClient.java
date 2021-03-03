@@ -151,7 +151,6 @@ public class ChatClient extends JFrame {
         button.setAlignmentX(JButton.CENTER_ALIGNMENT);
         mainPane.add(button);
 
-
         // Setup the menubar
         setupMenuBar();
     }
@@ -234,6 +233,7 @@ public class ChatClient extends JFrame {
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out.println("Yo, we're live");
+            recieveServerMsg(in);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -254,20 +254,22 @@ public class ChatClient extends JFrame {
             out.println("ENTER " + userName);
         }
     }
+
+    // Changes room/room name
     public void changeRoomName(String newRoom) {
-        roomName = newRoom;
-        //System.out.println("room command");
-        if (isAlphaNumeric(roomName) == true) {
-            roomNameAction.putValue(Action.NAME, "Room name: " + roomName);
-            if (out == null){
-                // Do nothing
-            } else {
-                out.println("JOIN " + roomName);
-            }
-        } else {
-            // TBD
-        }
-    }
+       roomName = newRoom;
+       //System.out.println("room command");
+       if (isAlphaNumeric(roomName) == true) {
+           roomNameAction.putValue(Action.NAME, "Room name: " + roomName);
+           if (out == null){
+               // Do nothing
+           } else {
+               out.println("JOIN " + roomName);
+           }
+       } else {
+           // TBD
+       }
+   }
 
     // Message Sending
     public void sendMsg(String msg) {
@@ -275,14 +277,38 @@ public class ChatClient extends JFrame {
             // When not connected to server
         } else {
             // When connected to server
-            out.println("TRANSMIT [" + userName + "]: " + msg);
+            out.println("TRANSMIT " + userName + " " + msg);
             postMessage("[" + userName + "]: " + msg);
         }
     }
 
+    // Gets messages from server
+    public void recieveServerMsg(BufferedReader input) throws IOException {
+      new Thread() {
+        public void run() {
+          boolean done = false;
+          try {
+              while(!done) {
+                String msg = input.readLine();
+                postMessage(msg);
+            }
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+        }
+      }.start();
+    }
+
+    // Only allows letters and numbers
     public static boolean isAlphaNumeric(String tempRoom) {
         return tempRoom != null && tempRoom.matches("^[a-zA-Z0-9]*$");
     }
+
+    // Processes messages from server to look neater
+    public void processMessage(String message) {
+
+    }
+
     // Post a message on the main Chat Text Area (with a new line)
     public synchronized void postMessage(String message) {
         chatTextArea.append(message + "\n");
