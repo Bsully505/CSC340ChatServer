@@ -89,7 +89,7 @@ public class ServerWorker extends Thread {
         printer("EXITING " + Username + "\n", RoomID);
         RoomID = line.split(" ", 2)[1];
         printBackToSender("ACK JOIN \n" + RoomID);
-        printer("Entering " + Username + "\n", RoomID);
+        printer(" Entering " + Username + "\n", RoomID);
     }
 
     public synchronized void EnterName(String line) throws IOException {
@@ -154,5 +154,3 @@ public class ServerWorker extends Thread {
     }
 
 }
-
-
