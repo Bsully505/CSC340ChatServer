@@ -8,9 +8,6 @@
  *    A textbox for updated messages
  *    An input textbox for entering in messages to send
  *    A "send" button to send the current textbox material.
- *
- * THIS IS JUST A FRAMEWORK so actual communication is not yet
- * established.
  ******/
 import javax.swing.*;
 import java.awt.*;
@@ -20,7 +17,6 @@ import java.io.PrintWriter;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
-import java.util.Scanner;
 
 public class ChatClient extends JFrame {
     public static void main(String[] args) {
@@ -39,10 +35,9 @@ public class ChatClient extends JFrame {
 
     private String hostname = "127.0.0.1";  // Default is local host
     // REMEMBER TO CHANGE
-    private int port = 1518;                // Default port is 1518
+    private int port = 1519;                // Default port is 1518
     private String userName = "<UNDEFINED>";
     private String roomName= "0";
-    private boolean resetFlag;
     private Socket socket = null;
     private PrintWriter out = null;
     private BufferedReader in = null;
@@ -79,7 +74,6 @@ public class ChatClient extends JFrame {
         label.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         mainPane.add(label);
         mainPane.add(scrollPane);
-
         // Set up a button to "send" the chat message
         Action sendAction = new AbstractAction("Send") {
             public void actionPerformed(ActionEvent e) {
@@ -87,17 +81,13 @@ public class ChatClient extends JFrame {
                 // and clear the text area
                 String message = sendTextArea.getText();
                 if (message != null && message != "") {
-                    // There is something to transmit
-                    // NOTE: You will want to fix this so it actually
-                    // TRANSMITS the message to the server!
                     sendMsg(message);
-                    //postMessage("DEBUG: Transmit: " + message);
                     sendTextArea.setText("");  // Clear out the field
                 }
                 sendTextArea.requestFocus();  // Focus back on box
             }
         };
-        sendAction.putValue(Action.SHORT_DESCRIPTION, "Push this to transmit message to server.");
+        sendAction.putValue(Action.SHORT_DESCRIPTION, "Push this to transmit your message to the server.");
 
         // ALT+ENTER will automatically trigger this button
         sendAction.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_ENTER);
@@ -110,31 +100,28 @@ public class ChatClient extends JFrame {
         setupTextAreaSend(sendAction);
 
         // Set up a button to get a new user name (and transmit request to the server)
-        nameAction = new AbstractAction("Set/Change User Name") {
+        nameAction = new AbstractAction("Change User Name") {
             public void actionPerformed(ActionEvent e) {
-                // Get the new user name and transmit to the server!
-                String newUserName = JOptionPane.showInputDialog("Please enter a user name.  Current user name: " + userName);
-                // NOTE: This does not TRANSMIT the request to the server
-                // This is just a placeholder to display the choice.
-                //postMessage("DEBUG: User name: " + newUserName);
-                changeUserName(newUserName); // Ideally, this would be done only once the server accepts and replies back with user name
-                //Change the above function to work with server
+                // Get the new username and transmit to the server!
+                changeUserName(userName);
             }
         };
-        changeUserName("<UNDEFINED>");
-        nameAction.putValue(Action.SHORT_DESCRIPTION, "Push this to change user name.");
+        //calls method before the GUI appears so the user must enter a name before connecting to the server
+        //this method is very similar to the changeUserName method with a small difference
+        initialUserName(userName);
+        nameAction.putValue(Action.SHORT_DESCRIPTION, "Push this to change your username.");
         button = new JButton(nameAction);
         button.setAlignmentX(JButton.CENTER_ALIGNMENT);
         mainPane.add(button);
-        //set up a button to input a group name and send the name to the server
-        roomNameAction = new AbstractAction("Set/Change room name") {
+        //set up a button to input a room name and send the name to the server
+        roomNameAction = new AbstractAction("Change the room name") {
             public void actionPerformed(ActionEvent e) {
                 // Get the new user name and transmit to the server!
                 String newRoomName = roomName;
                 boolean flag = true;
                 while(flag && newRoomName != null){
                     newRoomName = JOptionPane.showInputDialog("Enter a room name. Current room: " + roomName);
-                    if (isAlphaNumeric(newRoomName)){
+                    if (newRoomName!=null&&followsTextProtocol(newRoomName)){
                         changeRoomName(newRoomName);
                         flag = false;
                     } else {
@@ -146,17 +133,17 @@ public class ChatClient extends JFrame {
             }
         };
         changeRoomName("0");
-        roomNameAction.putValue(Action.SHORT_DESCRIPTION, "Push this to change the current room name.");
+        roomNameAction.putValue(Action.SHORT_DESCRIPTION, "Push this to change the room you are in.");
         button = new JButton(roomNameAction);
         button.setAlignmentX(JButton.CENTER_ALIGNMENT);
         mainPane.add(button);
+
 
         // Setup the menubar
         setupMenuBar();
     }
 
     private void setupTextAreaSend(Action sendAction) {
-        System.err.println("DEBUG: Setting up TextAreaSend");
         // Get InputMap and ActionMap for the sendTextArea
         InputMap inputMap = sendTextArea.getInputMap();
         ActionMap actionMap = sendTextArea.getActionMap();
@@ -213,9 +200,11 @@ public class ChatClient extends JFrame {
         // Menu item to create a connection
         menuAction = new AbstractAction("Connect to Server") {
             public void actionPerformed(ActionEvent e) {
-                //JOptionPane.showMessageDialog(null, "This is not yet implemented!\nPlease try again later.", "Unimplemented Option", JOptionPane.PLAIN_MESSAGE);
                 //Function Call establishConnection
                 establishConnection();
+                //sends initial JOIN and ENTER commands to the server when first connecting a client
+                out.println("ENTER " + userName);
+                out.println("JOIN " + roomName);
             }
         };
         menuAction.putValue(Action.SHORT_DESCRIPTION, "Connect to server.");
@@ -226,7 +215,7 @@ public class ChatClient extends JFrame {
         setJMenuBar(mbar);
     }
 
-    //  Connects to Server
+    //Method to connect to a server at a specific port
     public void establishConnection(){
         try {
             socket = new Socket(hostname, port);
@@ -242,75 +231,89 @@ public class ChatClient extends JFrame {
     }
 
     // Changes the user name on the nameAction
-    public void changeUserName(String newName) {
-        userName = newName;
-        nameAction.putValue(Action.NAME, "User Name: " + userName);
-        //System.out.println("Made it here");
-        if (out == null) {
-            // When not connected to server
-            //System.out.println("Not Conntected");
-        } else {
-            // When connected to server
-            out.println("ENTER " + userName);
+    public void initialUserName(String newName) {
+        newName = JOptionPane.showInputDialog("Please enter a user name. Current user name: " + userName);
+        //if the input is alphanumeric, not blank, and is the right size, and the user does not initially press cancel or x, send it through
+        if(newName!=null&&followsTextProtocol(newName)){
+            userName=newName;
+            nameAction.putValue(Action.NAME, "User Name: "+userName);
         }
+        else{
+            JOptionPane.showMessageDialog(null, "An invalid character was input, please only use AlphaNumerics.\nYou cannot cancel or close this box, either.");
+            initialUserName(newName);
+        }        
     }
-
-    // Changes room/room name
+    public void changeUserName(String newName) {
+        newName = JOptionPane.showInputDialog("Please enter a user name. Current user name: " + userName);
+        //check to see if user changes their mind and cancels the request
+        if(newName==null)return;
+        //if the input is both alphanumeric and not blank, send it through
+        if(followsTextProtocol(newName)){
+            userName=newName;
+            nameAction.putValue(Action.NAME, "User Name: "+userName);
+            if (out==null) {
+                // When not connected to server
+            } else {
+                // When connected to server
+                out.println("ENTER "+userName);
+            }
+        }
+        else{
+            JOptionPane.showMessageDialog(null, "An invalid character was input, please only use AlphaNumerics.");
+            changeUserName(newName);
+        }        
+    }
+    //This method is only called if the name given by the user follows protocol
     public void changeRoomName(String newRoom) {
-       roomName = newRoom;
-       //System.out.println("room command");
-       if (isAlphaNumeric(roomName) == true) {
-           roomNameAction.putValue(Action.NAME, "Room name: " + roomName);
-           if (out == null){
-               // Do nothing
-           } else {
-               out.println("JOIN " + roomName);
-           }
-       } else {
-           // TBD
-       }
-   }
+        roomName = newRoom;
+        roomNameAction.putValue(Action.NAME, "Room name: " + roomName);
+            if (out == null){
+                //If we are not connected to the server yet, do not transmit anything
+            } 
+            else {
+                out.println("JOIN " + roomName);
+            }
+    }
 
     // Message Sending
     public void sendMsg(String msg) {
         if (out == null) {
             // When not connected to server
         } else {
-            // When connected to server
-            out.println("TRANSMIT " + userName + " " + msg);
+            // When connected to server, sends with the format TRANSMIT [username] message
+            out.println("TRANSMIT "+ msg);
             postMessage("[" + userName + "]: " + msg);
         }
     }
-
-    // Gets messages from server
+    //Method to check if a given string contains only alphanumeric characters
+    public static boolean isAlphaNumeric(String isItAllowed) {
+        return isItAllowed != null && isItAllowed.matches("^[a-zA-Z0-9]*$");
+    }
     public void recieveServerMsg(BufferedReader input) throws IOException {
-      new Thread() {
-        public void run() {
-          boolean done = false;
-          try {
-              while(!done) {
-                String msg = input.readLine();
-                postMessage(msg);
+        new Thread() {
+          public void run() {
+            boolean done = false;
+            try {
+                while(!done) {
+                  String msg = input.readLine();
+                  postMessage(msg);
+              }
+            } catch (IOException e) {
+              e.printStackTrace();
             }
-          } catch (IOException e) {
-            e.printStackTrace();
           }
-        }
-      }.start();
+        }.start();
+      }
+    //Method to check usernames and group names to see if they are up to protocol
+    public static boolean followsTextProtocol(String isItAllowed){
+        return !isItAllowed.equals("")&!isItAllowed.contains(" ")&&isItAllowed.length()<=16&&isAlphaNumeric(isItAllowed);
     }
-
-    // Only allows letters and numbers
-    public static boolean isAlphaNumeric(String tempRoom) {
-        return tempRoom != null && tempRoom.matches("^[a-zA-Z0-9]*$");
-    }
-
-    // Processes messages from server to look neater
-    public void processMessage(String message) {
-
-    }
-
     // Post a message on the main Chat Text Area (with a new line)
     public synchronized void postMessage(String message) {
         chatTextArea.append(message + "\n");
+    }
+    //sends the "EXIT" message to the server when the user closes out of the client
+    public void closeMessage(){
+        //not sure how to tell if the user exits the chat, hmmm
     }
 }
