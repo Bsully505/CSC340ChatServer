@@ -18,7 +18,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
 
-public class ChatClient extends JFrame {
+public class ChatClient extends JFrame implements WindowListener{
     public static void main(String[] args) {
         // Create and start up the ChatClient Frame
         ChatClient frame = new ChatClient();
@@ -26,6 +26,9 @@ public class ChatClient extends JFrame {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
+        //adds listener to the main frame so if the user closes the chat client
+        //and a connection is established it sends a message to the server before closing
+       
     }
 
     private JTextArea chatTextArea;
@@ -41,9 +44,12 @@ public class ChatClient extends JFrame {
     private Socket socket = null;
     private PrintWriter out = null;
     private BufferedReader in = null;
+    private String clientName="";
+    private String clientMsg = "";
 
     /* Constructor: Sets up the initial look-and-feel */
     public ChatClient() {
+        addWindowListener(this);
         JLabel label;  // Temporary variable for a label
         JButton button; // Temporary variable for a button
 
@@ -74,6 +80,14 @@ public class ChatClient extends JFrame {
         label.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         mainPane.add(label);
         mainPane.add(scrollPane);
+        // frame.addWindowListener(new java.awt.event.WindowAdapter() {
+        //     @Override
+        //     public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+        //         //closeMessage(); 
+        //         System.exit(0);
+        //     }
+        // });
+
         // Set up a button to "send" the chat message
         Action sendAction = new AbstractAction("Send") {
             public void actionPerformed(ActionEvent e) {
@@ -296,7 +310,37 @@ public class ChatClient extends JFrame {
             try {
                 while(!done) {
                   String msg = input.readLine();
-                  postMessage(msg);
+                  //postMessage(msg);
+                  String firstSwitch = msg.split(" ")[1];
+                  String secondSwitch = msg.split(" ")[0];
+                  // Parsing the messages from server to look neater on GUI
+                  switch(firstSwitch){
+                    case "ENTER":
+                      clientName = msg.split(" ")[2];
+                      postMessage("<SERVER> " + clientName + " has entered the room");
+                      break;
+                    case "JOIN":
+                      // Nothing needs to be shown from this recieved message
+                      break;
+                    case "Entering":
+                      clientName = msg.split(" ")[2];
+                      postMessage("<SERVER> " + clientName + " has entered the room");
+                    default:
+                    System.out.println(msg);
+                  }
+                  switch(secondSwitch) {
+                    case "NEWMESSAGE":
+                      clientName = msg.split(" ")[1];
+                      clientMsg = msg.substring(msg.indexOf(" "), msg.length());
+                      postMessage("[" + clientName + "]: " + clientMsg);
+                      break;
+                    case "EXITING":
+                      clientName = msg.split(" ")[1];
+                      postMessage("<SERVER> " + clientName + " has left the room");
+                      break;
+                    default:
+                    System.out.println(msg);
+                  }
               }
             } catch (IOException e) {
               e.printStackTrace();
@@ -314,6 +358,32 @@ public class ChatClient extends JFrame {
     }
     //sends the "EXIT" message to the server when the user closes out of the client
     public void closeMessage(){
-        //not sure how to tell if the user exits the chat, hmmm
+        //if no connection is established, do nothing
+        if(out==null)return;
+        //if a connection is established, write to server
+        else out.println("EXIT");
+        
     }
+
+    //you must go, your people need you
+    //method to send "EXIT" protocol upon the client closing the chat completely
+    //only sends to the server if it is actually connected to the server
+    @Override
+    public void windowClosing(WindowEvent e) {
+        if(out==null)return;
+        else out.println("EXIT");
+    }
+    //sorry guys, we don't need you
+    @Override
+    public void windowOpened(WindowEvent e) {}
+    @Override
+    public void windowClosed(WindowEvent e) {}
+    @Override
+    public void windowIconified(WindowEvent e) {}
+    @Override
+    public void windowDeiconified(WindowEvent e) {}
+    @Override
+    public void windowActivated(WindowEvent e) {}
+    @Override
+    public void windowDeactivated(WindowEvent e) {}
 }
