@@ -46,7 +46,6 @@ public class ChatClient extends JFrame implements WindowListener{
     private BufferedReader in = null;
     private String clientName="";
     private String clientMsg = "";
-    private String switchRoom = "";
 
     /* Constructor: Sets up the initial look-and-feel */
     public ChatClient() {
