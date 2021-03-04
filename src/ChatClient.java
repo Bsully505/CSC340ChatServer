@@ -321,13 +321,13 @@ public class ChatClient extends JFrame implements WindowListener{
                       postMessage("<SERVER> " + clientName + " has entered the room");
                       break;
                     case "JOIN":
-                      clientName = msg.split(" ")[2];
-                      postMessage("<SERVER> " + clientName + " has entered the room");
+                      // Nothing needs to be shown from this recieved message
                       break;
                     case "Entering":
                       clientName = msg.split(" ")[2];
-                      switchRoom = msg.split(" ")[0];
+                      postMessage("<SERVER> " + clientName + " has entered the room");
                     default:
+                    System.out.println(msg);
                   }
                   switch(secondSwitch) {
                     case "NEWMESSAGE":
@@ -339,8 +339,8 @@ public class ChatClient extends JFrame implements WindowListener{
                       clientName = msg.split(" ")[1];
                       postMessage("<SERVER> " + clientName + " has left the room");
                       break;
-
                     default:
+                    System.out.println(msg);
                   }
               }
             } catch (IOException e) {
