@@ -28,7 +28,7 @@ public class ChatClient extends JFrame implements WindowListener{
         frame.setVisible(true);
         //adds listener to the main frame so if the user closes the chat client
         //and a connection is established it sends a message to the server before closing
-       
+
     }
 
     private JTextArea chatTextArea;
@@ -38,7 +38,7 @@ public class ChatClient extends JFrame implements WindowListener{
 
     private String hostname = "127.0.0.1";  // Default is local host
     // REMEMBER TO CHANGE
-    private int port = 1519;                // Default port is 1518
+    private int port = 1518;                // Default port is 1518
     private String userName = "<UNDEFINED>";
     private String roomName= "0";
     private Socket socket = null;
@@ -84,7 +84,7 @@ public class ChatClient extends JFrame implements WindowListener{
         // frame.addWindowListener(new java.awt.event.WindowAdapter() {
         //     @Override
         //     public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-        //         //closeMessage(); 
+        //         //closeMessage();
         //         System.exit(0);
         //     }
         // });
@@ -219,7 +219,7 @@ public class ChatClient extends JFrame implements WindowListener{
                 establishConnection();
                 //sends initial JOIN and ENTER commands to the server when first connecting a client
                 out.println("ENTER " + userName);
-                out.println("JOIN " + roomName);
+    //            out.println("JOIN " + roomName);
             }
         };
         menuAction.putValue(Action.SHORT_DESCRIPTION, "Connect to server.");
@@ -236,7 +236,6 @@ public class ChatClient extends JFrame implements WindowListener{
             socket = new Socket(hostname, port);
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out.println("Yo, we're live");
             recieveServerMsg(in);
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -256,7 +255,7 @@ public class ChatClient extends JFrame implements WindowListener{
         else{
             JOptionPane.showMessageDialog(null, "An invalid character was input, please only use AlphaNumerics.\nYou cannot cancel or close this box, either.");
             initialUserName(newName);
-        }        
+        }
     }
     public void changeUserName(String newName) {
         newName = JOptionPane.showInputDialog("Please enter a user name. Current user name: " + userName);
@@ -276,7 +275,7 @@ public class ChatClient extends JFrame implements WindowListener{
         else{
             JOptionPane.showMessageDialog(null, "An invalid character was input, please only use AlphaNumerics.");
             changeUserName(newName);
-        }        
+        }
     }
     //This method is only called if the name given by the user follows protocol
     public void changeRoomName(String newRoom) {
@@ -284,7 +283,7 @@ public class ChatClient extends JFrame implements WindowListener{
         roomNameAction.putValue(Action.NAME, "Room name: " + roomName);
             if (out == null){
                 //If we are not connected to the server yet, do not transmit anything
-            } 
+            }
             else {
                 out.println("JOIN " + roomName);
             }
@@ -296,8 +295,16 @@ public class ChatClient extends JFrame implements WindowListener{
             // When not connected to server
         } else {
             // When connected to server, sends with the format TRANSMIT [username] message
-            out.println("TRANSMIT "+ msg);
-            postMessage("[" + userName + "]: " + msg);
+            if(msg.contains("\n")){
+                 String[] newMSG =msg.split("\n");
+                 for(String i: newMSG){
+                     out.println("TRANSMIT " + i);
+                 }
+              }
+              else {
+                  out.println("TRANSMIT " + msg);
+              }
+          //  postMessage("[" + userName + "]: " + msg);
         }
     }
     //Method to check if a given string contains only alphanumeric characters
@@ -327,21 +334,23 @@ public class ChatClient extends JFrame implements WindowListener{
                       clientName = msg.split(" ")[2];
                       postMessage("<SERVER> " + clientName + " has entered the room");
                     default:
-                    System.out.println(msg);
                   }
                   switch(secondSwitch) {
                     case "NEWMESSAGE":
                       clientName = msg.split(" ")[1];
-                      clientMsg = msg.substring(msg.indexOf(" "), msg.length());
+                      clientMsg = msg.split(" ", 3)[2];
                       postMessage("[" + clientName + "]: " + clientMsg);
                       break;
                     case "EXITING":
                       clientName = msg.split(" ")[1];
                       postMessage("<SERVER> " + clientName + " has left the room");
                       break;
+                    case "Entering":
+                      clientName = msg.split(" ")[1];
+                      postMessage("<SERVER> " + clientName + " has entered the room");
                     default:
-                    System.out.println(msg);
-                  }
+
+                  } System.out.println(msg);
               }
             } catch (IOException e) {
               e.printStackTrace();
@@ -363,7 +372,7 @@ public class ChatClient extends JFrame implements WindowListener{
         if(out==null)return;
         //if a connection is established, write to server
         else out.println("EXIT");
-        
+
     }
 
     //you must go, your people need you

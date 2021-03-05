@@ -47,7 +47,7 @@ public class ServerWorker extends Thread {
         String line;
         while(!client.isClosed() && (line = in.readLine()) != null){
 
-            String NewLiner = line;
+            String NewLiner = line.toUpperCase();
             if(line.contains(" ")){
 
                  NewLiner = line.split(" ")[0].toUpperCase();
@@ -62,9 +62,8 @@ public class ServerWorker extends Thread {
                     break;
                 case "JOIN":
                     this.JoinRoom(line);
-                    //i need to create a join room
                     break;
-                case "EXIT": // this is not working
+                case "EXIT":
                     this.Exit(line);
                     break;
                 case "PRINT":
@@ -80,7 +79,8 @@ public class ServerWorker extends Thread {
             System.out.println(msg);//this is the thing that is printing onto my terminal
 
         }
-        System.out.println("someone has left");
+        // Somone leaving now closing the socket.
+        System.out.println(Username + " has left");
         client.close();
 
 
@@ -88,7 +88,7 @@ public class ServerWorker extends Thread {
     public synchronized void JoinRoom(String line) throws IOException {
         printer("EXITING " + Username + "\n", RoomID);
         RoomID = line.split(" ", 2)[1];
-        printBackToSender("ACK JOIN \n" + RoomID);
+        printBackToSender("ACK JOIN " + RoomID + "\n");
         printer("Entering " + Username + "\n", RoomID);
     }
 
@@ -140,7 +140,7 @@ public class ServerWorker extends Thread {
     public synchronized void printer(String zed,String RoomKey) throws IOException {// nobody can connect at this time
         this.clientell = ChatServer.getClientell();
         for(ServerWorker s: clientell){
-            if(s.RoomID == RoomKey) {
+            if(s.RoomID.equals(RoomKey)) {
                 Socket temp = s.getSocket();
                 OutputStream out = temp.getOutputStream();
                 out.write(zed.getBytes());
@@ -154,5 +154,3 @@ public class ServerWorker extends Thread {
     }
 
 }
-
-
