@@ -19,6 +19,6 @@ individual.
 
 A description of how the tasks were divided out among the members.
 
-Bryan, Henok - wanted to work together on the server
-Jack, Dylan - worked together on the client-side. 
-Harrison - was remote and couldn't meet in person so contributed to certain tasks that needed to be done. 
+1) Bryan, Henok - wanted to work together on the server
+2) Jack, Dylan - worked together on the client-side. 
+3) Harrison - was remote and couldn't meet in person so contributed to certain tasks that needed to be done. 
