@@ -1,1 +1,2 @@
 # CSC340ChatServer
+# Jack Zemlanicky: worked on ChatClient.java- added protocol and functionality for changing usernames, room names, window close functionality, and commented the code to further describe what each method does. Added  dialog boxes to handle user errors when choosing their name and room name. Also assisted Dylan with the initial establishment of connection for the client to the server.
