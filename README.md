@@ -17,6 +17,7 @@ Dylan: Worked on ChatClient.java- created establishConnection and recieveServerM
 Harrison - worked mostly on ChatServer and also synchronized functions in both ChatServer and ChatClient
 
 A description of how the tasks were divided out among the members.
+
 Bryan, Henok - wanted to work together on the server
 Jack, Dylan - worked together on the client-side. 
 Harrison - was remote and couldn't meet in person so contributed to certain tasks that needed to be done. 
