@@ -1,3 +1,9 @@
+/******
+* ChatServer
+* Author: Henok Ketsela, Bryan Sullivan, and Harrison Dominique
+*
+* This code handels accepts sockets and places them into an arraylist
+******/
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
