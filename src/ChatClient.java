@@ -80,14 +80,6 @@ public class ChatClient extends JFrame implements WindowListener{
     label.setAlignmentX(JLabel.CENTER_ALIGNMENT);
     mainPane.add(label);
     mainPane.add(scrollPane);
-    // frame.addWindowListener(new java.awt.event.WindowAdapter() {
-    //     @Override
-    //     public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-    //         //closeMessage();
-    //         System.exit(0);
-    //     }
-    // });
-
     // Set up a button to "send" the chat message
     Action sendAction = new AbstractAction("Send") {
       public void actionPerformed(ActionEvent e) {
@@ -218,13 +210,11 @@ public class ChatClient extends JFrame implements WindowListener{
         establishConnection();
         //sends initial JOIN and ENTER commands to the server when first connecting a client
         out.println("ENTER " + userName);
-        //            out.println("JOIN " + roomName);
       }
     };
     menuAction.putValue(Action.SHORT_DESCRIPTION, "Connect to server.");
     menuItem = new JMenuItem(menuAction);
     menu.add(menuItem);
-
     mbar.add(menu);
     setJMenuBar(mbar);
   }
@@ -266,7 +256,8 @@ public class ChatClient extends JFrame implements WindowListener{
       nameAction.putValue(Action.NAME, "User Name: "+userName);
       if (out==null) {
         // When not connected to server
-      } else {
+      } 
+      else {
         // When connected to server
         out.println("ENTER "+userName);
       }
@@ -305,7 +296,6 @@ public class ChatClient extends JFrame implements WindowListener{
           out.println("TRANSMIT " + msg);
         }
       }
-      //  postMessage("[" + userName + "]: " + msg);
     }
   }
   //Method to check if a given string contains only alphanumeric characters
@@ -376,10 +366,9 @@ public class ChatClient extends JFrame implements WindowListener{
 
   }
 
-  //you must go, your people need you
   //method to send "EXIT" protocol upon the client closing the chat completely
   //only sends to the server if it is actually connected to the server
-  @Override
+  @Override//the chosen one resides here
   public void windowClosing(WindowEvent e) {
     if(out==null)return;
     else out.println("EXIT");
@@ -387,15 +376,14 @@ public class ChatClient extends JFrame implements WindowListener{
   //sorry guys, we don't need you
   @Override
   public void windowOpened(WindowEvent e) {}
-    @Override
-    public void windowClosed(WindowEvent e) {}
-      @Override
-      public void windowIconified(WindowEvent e) {}
-        @Override
-        public void windowDeiconified(WindowEvent e) {}
-          @Override
-          public void windowActivated(WindowEvent e) {}
-            @Override
-            public void windowDeactivated(WindowEvent e) {}
-            }
-            
+  @Override
+  public void windowClosed(WindowEvent e) {}
+  @Override
+  public void windowIconified(WindowEvent e) {}
+  @Override
+  public void windowDeiconified(WindowEvent e) {}
+  @Override
+  public void windowActivated(WindowEvent e) {}
+  @Override
+  public void windowDeactivated(WindowEvent e) {}
+}
