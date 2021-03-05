@@ -1,12 +1,12 @@
 # CSC340ChatServer
 Authors: Dylan Irwin, Jack Zemlanicky, Henok Ketsela, Bryan Sullivan, and Harrison Dominique
 
- Instructions on how to compile and run both the server and client code.
+Instructions on how to compile and run both the server and client code.
 1) Open file and compile 
 2) run ChatServer 
 3) run multiple ChatClients
 
- A breakdown of the work that each member of the team did, what parts were contributed by that
+A breakdown of the work that each member of the team did, what parts were contributed by that
 individual.
 Bryan, Henok - created and worked on ChatServer and ServerWorker
 
@@ -16,7 +16,7 @@ Dylan: Worked on ChatClient.java- created establishConnection and recieveServerM
 
 Harrison - worked mostly on ChatServer and also synchronized functions in both ChatServer and ChatClient
 
- A description of how the tasks were divided out among the members.
+A description of how the tasks were divided out among the members.
 Bryan, Henok - wanted to work together on the server
 Jack, Dylan - worked together on the client-side. 
 Harrison - was remote and couldn't meet in person so contributed to certain tasks that needed to be done. 
