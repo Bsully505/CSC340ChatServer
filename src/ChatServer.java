@@ -7,7 +7,9 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class ChatServer {
 // variables
@@ -15,8 +17,14 @@ public class ChatServer {
     public static int port;
 
     // setting the port to 1518
-    public  ChatServer(){
+    public  ChatServer() throws IOException {
         this.port = 1518;
+        String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+        File Logger = new File("../ChatLog"+date+".txt");
+
+        BufferedWriter writer = new BufferedWriter(new FileWriter(Logger,true));
+        writer.append("-------new Server-------"+ "\n");
+        writer.close();
     }
 
 
@@ -45,7 +53,7 @@ public class ChatServer {
         }
     }
 // main method to run the server
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         ChatServer cS = new ChatServer();
         cS.run();
 

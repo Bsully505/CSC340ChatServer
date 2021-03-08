@@ -9,7 +9,10 @@
 import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
+import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class ServerWorker extends Thread {
 
@@ -19,12 +22,19 @@ public class ServerWorker extends Thread {
     private String Username = "";
     private static OutputStream output;
     private String RoomID = "0";
+    private BufferedWriter writer;
+
 
     // constructor
     // takes in a socket to establish a connection
     public ServerWorker(Socket client) throws IOException {
         this.client = client;
         output = client.getOutputStream();
+        String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+        File Logger = new File("../ChatLog"+date+".txt");
+
+        writer = new BufferedWriter(new FileWriter(Logger,true));
+
 
     }
 
@@ -84,8 +94,16 @@ public class ServerWorker extends Thread {
             }
 
             // prints out what the user said to the system
-            String msg = this.Username + " Typed: " + line+ "\n";
+            String msg = this.Username + " Transmitted: " + line+ "\n";
             System.out.println(msg);//this is the thing that is printing onto my terminal
+
+            String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+            File Logger = new File("../ChatLog"+date+".txt");
+
+            writer = new BufferedWriter(new FileWriter(Logger,true));
+            writer.append(msg);
+            writer.close();
+
 
         }
         // prints out who is left the server and closes the socket connection
@@ -158,6 +176,15 @@ public class ServerWorker extends Thread {
         this.clientell = ChatServer.getClientell();
         // for loop goes through the arraylist of serverworkers
         // writes out the message
+        Date Tim = new Date();
+        Time tmp = new Time(Tim.getTime());
+
+        String logMsg = tmp + ": " + this.Username + " "+ zed ;
+        String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+        File Logger = new File("../ChatLog"+date+".txt");
+        writer = new BufferedWriter(new FileWriter(Logger,true));
+        writer.append(logMsg);
+        writer.close();
         for(ServerWorker s: clientell){
             // checks if the server worker room id is equal to the Room id of where they want to output a message
             if(s.RoomID.equals(RoomKey)) {
